@@ -65,8 +65,7 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 	    	if (split.length == 2) {
 	    		rangeEnd = Long.parseLong(split[1]);
 	    	}
-		    System.out.println("FROM HEADER. Range " + " " + rangeStart + " -- " + rangeEnd);
-		    
+
 		    StreamResource streamResource = 
 		    		(StreamResource) VideoJS.getResourcesRegistrations().get(request.getPathInfo()).getKey().getResource();
 
