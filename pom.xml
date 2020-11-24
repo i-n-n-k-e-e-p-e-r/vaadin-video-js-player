@@ -2,9 +2,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.brownie.videojs</groupId>
-    <artifactId>vaadin-video-js-player</artifactId>
-    <version>0.1</version>
-    <name>vaadin-video-js-player</name>
+    <artifactId>video-js-player</artifactId>
+    <version>1.0.0</version>
+    <name>video-js-player</name>
     <description>Integration of video.js for Vaadin platform</description>
 
     <properties>
