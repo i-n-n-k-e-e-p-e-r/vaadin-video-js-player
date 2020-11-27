@@ -3,12 +3,12 @@
 
     <groupId>com.brownie.videojs</groupId>
     <artifactId>video-js-player</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>video-js-player</name>
     <description>Integration of video.js for Vaadin platform</description>
 
     <properties>
-        <vaadin.version>14.4.2</vaadin.version>
+        <vaadin.version>14.4.3</vaadin.version>
 
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
