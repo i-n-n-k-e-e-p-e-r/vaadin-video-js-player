@@ -47,7 +47,8 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 			return super.handleRequest(session, request, response); 
 		}
 
-	    File file = VideoJS.getResourcesRegistrations().get(request.getPathInfo()).getValue();
+		String resourcePathFromRequest = request.getPathInfo().replace(" ", "%20");
+	    File file = VideoJS.getResourcesRegistrations().get(resourcePathFromRequest).getValue();
 	    if (!file.exists()) {
 	    	response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 	    	return true;
@@ -57,20 +58,20 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 	    
 	    FileInputStream input = new FileInputStream(file);
 	    session.access(() -> {
-		    long rangeStart = 0;
+		    long rangeStart;
 		    long rangeEnd = -1;
 		    
-	    	String[] split = header.substring(6, header.length()).split("-");
+	    	String[] split = header.substring(6).split("-");
 	    	rangeStart = Long.parseLong(split[0]);
 	    	if (split.length == 2) {
 	    		rangeEnd = Long.parseLong(split[1]);
 	    	}
 
 		    StreamResource streamResource = 
-		    		(StreamResource) VideoJS.getResourcesRegistrations().get(request.getPathInfo()).getKey().getResource();
+		    		(StreamResource) VideoJS.getResourcesRegistrations().get(resourcePathFromRequest).getKey().getResource();
 
 		    try {
-				writeResponse(session, request, response, file, input, streamResource, rangeStart, rangeEnd);
+				writeResponse(response, file, input, streamResource, rangeStart, rangeEnd);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -79,14 +80,12 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 	    return true;
 	}
 
-    public static void writeResponse(VaadinSession session, 
-    	VaadinRequest request, 
-		VaadinResponse response,
-		File file,
-		FileInputStream data,
-		StreamResource streamResource,
-		long rangeStart, 
-		long rangeEnd) throws IOException {
+    public static void writeResponse(VaadinResponse response,
+									 File file,
+									 FileInputStream data,
+									 StreamResource streamResource,
+									 long rangeStart,
+									 long rangeEnd) throws IOException {
 
         if (data == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -102,7 +101,7 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
             response.setCacheTime(streamResource.getCacheTime());
 
             final byte[] buffer = new byte[BUFFER_SIZE];
-            int bytesRead = 0;
+            int bytesRead;
 
             // Calculate range that is going to be served if this was range request
             long bytesToWrite = -1;

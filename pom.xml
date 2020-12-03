@@ -3,7 +3,7 @@
 
     <groupId>com.brownie.videojs</groupId>
     <artifactId>video-js-player</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>video-js-player</name>
     <description>Integration of video.js for Vaadin platform</description>
 
@@ -246,7 +246,7 @@
                         </executions>
                         <configuration>
                             <quiet>true</quiet>
-                            <additionalparam>-Xdoclint:none</additionalparam>
+<!--                            <additionalparam>-Xdoclint:none</additionalparam>-->
                         </configuration>
                     </plugin>
                     <plugin>

@@ -30,9 +30,9 @@ public class DemoView extends VerticalLayout {
 		
         HorizontalLayout hl = new HorizontalLayout();
 		Button play = new Button("play");
-		play.addClickListener(event -> { video.play(); });
+		play.addClickListener(event -> video.play());
 		Button pause = new Button("pause");
-		pause.addClickListener(event -> { video.pause(); });
+		pause.addClickListener(event -> video.pause());
 		
 		hl.add(play);
 		hl.add(pause);

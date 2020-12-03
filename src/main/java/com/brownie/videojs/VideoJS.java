@@ -1,25 +1,16 @@
 package com.brownie.videojs;
 
-import java.io.File;
-import java.net.URI;
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.PropertyDescriptor;
-import com.vaadin.flow.component.PropertyDescriptors;
-import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
+
+import java.io.File;
+import java.net.URI;
+import java.util.*;
 
 
 @Tag("video")
@@ -57,7 +48,7 @@ public class VideoJS extends Component implements HasSize {
 	 */	
 	private StreamResource mediaResource;
 	private static final Map<String, AbstractMap.SimpleImmutableEntry<StreamRegistration, File>> resourcesRegistrations = 
-			Collections.synchronizedMap(new HashMap<String, AbstractMap.SimpleImmutableEntry<StreamRegistration, File>>());
+			Collections.synchronizedMap(new HashMap<>());
 
 	public VideoJS(VaadinSession session, File mediaFile, File posterImage) {
 		if (mediaFile == null ) {
@@ -93,9 +84,7 @@ public class VideoJS extends Component implements HasSize {
 			this.setPosterURI(posterRegistration.getResourceUri());
 		}
 
-		this.addAttachListener(event -> {
-			enableControls(true);
-		});
+		this.addAttachListener(event -> enableControls(true));
 		
 		this.addDetachListener(event -> {
 			unregisterResource(mediaRegistration);
@@ -107,8 +96,8 @@ public class VideoJS extends Component implements HasSize {
 		if (file == null || !file.exists() || streamResource == null) return null;
 		
 		StreamRegistration registration = session.getResourceRegistry().registerResource(streamResource);
-		getResourcesRegistrations().put("/" + registration.getResourceUri().toString(), 
-				new AbstractMap.SimpleImmutableEntry<StreamRegistration, File>(registration, file));
+		getResourcesRegistrations().put("/" + registration.getResourceUri().toString().replace(" ", "%20"),
+				new AbstractMap.SimpleImmutableEntry<>(registration, file));
 		
 		return registration;
 	}
@@ -124,13 +113,14 @@ public class VideoJS extends Component implements HasSize {
 	public void unregisterAllResources(StreamRegistration registration) {
 		if (registration == null) return;
 		
-		getResourcesRegistrations().entrySet().stream().peek((e) -> e.getValue().getKey().unregister());	
+		getResourcesRegistrations().forEach((key, value) -> value.getKey().unregister());
 		getResourcesRegistrations().clear();
 	}
 	
 	public void pause() {
 		try {
-			UI ui = this.getUI().get();
+			var ui = this.getUI().isPresent() ? this.getUI().get() : null;
+			if (ui == null) return;
 			ui.getPage().executeJs(("document.getElementById(\"" + getVideoTagId() + "\").pause();"));
 		} catch (NoSuchElementException ex) {
 			ex.printStackTrace();
@@ -139,7 +129,8 @@ public class VideoJS extends Component implements HasSize {
 	
 	public void play() {
 		try {
-			UI ui = this.getUI().get();
+			var ui = this.getUI().isPresent() ? this.getUI().get() : null;
+			if (ui == null) return;
 			ui.getPage().executeJs(("document.getElementById(\"" + getVideoTagId() + "\").play();"));
 		} catch (NoSuchElementException ex) {
 			ex.printStackTrace();
@@ -166,7 +157,8 @@ public class VideoJS extends Component implements HasSize {
 	
 	public VideoJS enableControls(boolean value) {
 		try {
-			UI ui = this.getUI().get();
+			var ui = this.getUI().isPresent() ? this.getUI().get() : null;
+			if (ui == null) return this;
 			ui.getPage().executeJs(("document.getElementById(\"" + getVideoTagId() + "\").controls = " + value + ";"));
 		} catch (NoSuchElementException ex) {
 			ex.printStackTrace();
@@ -177,7 +169,8 @@ public class VideoJS extends Component implements HasSize {
 	
 	public VideoJS setPreload(boolean value) {
 		try {
-			UI ui = this.getUI().get();
+			var ui = this.getUI().isPresent() ? this.getUI().get() : null;
+			if (ui == null) return this;
 			ui.getPage().executeJs(("document.getElementById(\"" + getVideoTagId() + "\").preload = " + value + ";"));
 		} catch (NoSuchElementException ex) {
 			ex.printStackTrace();
