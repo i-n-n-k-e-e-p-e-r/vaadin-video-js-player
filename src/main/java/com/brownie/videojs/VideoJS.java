@@ -10,10 +10,7 @@ import com.vaadin.flow.server.VaadinSession;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Tag("video")
