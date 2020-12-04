@@ -10,7 +10,10 @@ import com.vaadin.flow.server.VaadinSession;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Tag("video")
@@ -96,6 +99,7 @@ public class VideoJS extends Component implements HasSize {
 		if (file == null || !file.exists() || streamResource == null) return null;
 		
 		StreamRegistration registration = session.getResourceRegistry().registerResource(streamResource);
+
 		getResourcesRegistrations().put("/" + registration.getResourceUri().toString().replace(" ", "%20"),
 				new AbstractMap.SimpleImmutableEntry<>(registration, file));
 		

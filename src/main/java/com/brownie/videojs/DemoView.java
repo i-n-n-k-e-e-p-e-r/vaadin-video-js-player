@@ -22,7 +22,7 @@ public class DemoView extends VerticalLayout {
 		setPadding(true);
 		setSpacing(true);
 		
-		File mediaFile = Paths.get(".", "src", "main", "resources", "example.mov").toFile();
+		File mediaFile = Paths.get(".", "src", "main", "resources", "пример (super 1).mov").toFile();
 		File posterImage = Paths.get(".", "src", "main", "resources", "poster.jpg").toFile();
 		
         final VideoJS video = new VideoJS(UI.getCurrent().getSession(), mediaFile, posterImage);

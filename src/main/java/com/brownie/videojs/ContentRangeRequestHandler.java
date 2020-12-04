@@ -6,7 +6,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,7 +51,13 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 			return super.handleRequest(session, request, response); 
 		}
 
-		String resourcePathFromRequest = request.getPathInfo().replace(" ", "%20");
+//		String resourcePathFromRequest = request.getPathInfo().replace(" ", "%20");
+		String splitter = "/";
+		String resourcePathFromRequest = Arrays.stream(request.getPathInfo().split(splitter))
+				.map(value ->
+						URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20"))
+				.collect(Collectors.joining(splitter));
+		System.out.println("GET " + resourcePathFromRequest);
 	    File file = VideoJS.getResourcesRegistrations().get(resourcePathFromRequest).getValue();
 	    if (!file.exists()) {
 	    	response.setStatus(HttpServletResponse.SC_NOT_FOUND);
