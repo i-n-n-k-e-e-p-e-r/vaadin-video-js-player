@@ -24,7 +24,7 @@ public class DemoView extends VerticalLayout {
 		
 		File mediaFile = Paths.get(".", "src", "main", "resources", "пример (super 1).mov").toFile();
 		File posterImage = Paths.get(".", "src", "main", "resources", "poster.jpg").toFile();
-		
+
         final VideoJS video = new VideoJS(UI.getCurrent().getSession(), mediaFile, posterImage);
         video.setHeight("50%");
 		

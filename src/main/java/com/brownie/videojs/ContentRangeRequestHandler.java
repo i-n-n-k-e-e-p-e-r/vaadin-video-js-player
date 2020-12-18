@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinResponse;
@@ -43,12 +44,14 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 	@Override
 	public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response)
 			throws IOException {
-		
-		String agent = request.getHeader("User-Agent");
+
 		String header = request.getHeader("Range");
-		
-		if (header == null || (agent != null && !agent.contains("Safari") && !agent.contains("AppleWebKit"))) {
-			return super.handleRequest(session, request, response); 
+		if (header == null) {
+			return super.handleRequest(session, request, response);
+		}
+
+		if (!isSafari(session)) {
+			return super.handleRequest(session, request, response);
 		}
 
 		String splitter = "/";
@@ -86,6 +89,20 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 	    });
 
 	    return true;
+	}
+
+	private boolean isSafari(VaadinSession session) {
+		boolean result = false;
+		try {
+			session.lock();
+			result = session.getBrowser().isSafari();
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			session.unlock();
+		}
+
+		return result;
 	}
 
     public static void writeResponse(VaadinResponse response,
