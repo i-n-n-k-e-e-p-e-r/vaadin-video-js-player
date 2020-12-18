@@ -3,7 +3,7 @@
 
     <groupId>com.brownie.videojs</groupId>
     <artifactId>video-js-player</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <name>video-js-player</name>
     <description>Integration of video.js for Vaadin platform</description>
 
