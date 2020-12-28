@@ -68,25 +68,27 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 	    response.setHeader("Accept-Ranges", "bytes");
 	    
 	    FileInputStream input = new FileInputStream(file);
-	    session.access(() -> {
-		    long rangeStart;
-		    long rangeEnd = -1;
-		    
-	    	String[] split = header.substring(6).split("-");
-	    	rangeStart = Long.parseLong(split[0]);
-	    	if (split.length == 2) {
-	    		rangeEnd = Long.parseLong(split[1]);
-	    	}
+	    if (session != null)
+			session.access(() -> {
+				long rangeStart;
+				long rangeEnd = -1;
 
-		    StreamResource streamResource = 
-		    		(StreamResource) VideoJS.getResourcesRegistrations().get(resourcePathFromRequest).getKey().getResource();
+				String[] split = header.substring(6).split("-");
+				rangeStart = Long.parseLong(split[0]);
+				if (split.length == 2) {
+					rangeEnd = Long.parseLong(split[1]);
+				}
 
-		    try {
-				writeResponse(response, file, input, streamResource, rangeStart, rangeEnd);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	    });
+				StreamResource streamResource =
+						(StreamResource) VideoJS.getResourcesRegistrations().get(resourcePathFromRequest).getKey().getResource();
+
+				try {
+					if (streamResource != null)
+						writeResponse(response, file, input, streamResource, rangeStart, rangeEnd);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
 
 	    return true;
 	}
@@ -123,7 +125,9 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
             response.setContentType(Files.probeContentType(file.toPath()));
 
             // Sets cache headers
-            response.setCacheTime(streamResource.getCacheTime());
+			if (streamResource != null && response != null) {
+				response.setCacheTime(streamResource.getCacheTime());
+			}
 
             final byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead;
