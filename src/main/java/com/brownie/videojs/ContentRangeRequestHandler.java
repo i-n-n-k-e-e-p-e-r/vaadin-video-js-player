@@ -133,13 +133,14 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
             int bytesRead;
 
             // Calculate range that is going to be served if this was range request
+			long contentLength = file.length();
             long bytesToWrite = -1;
             data.skip(rangeStart); // Skip to start offset of the request
             if (rangeStart > 0 || rangeEnd > 0) {
             	response.setStatus(206); // 206 response code needed since this is partial data
-            	long contentLength = data.available();
-            	if (rangeEnd == -1) rangeEnd = contentLength - 1;
-            	response.setHeader("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + contentLength);
+//            	long contentLength = data.available();
+            	if (rangeEnd == -1) rangeEnd = data.available() - 1;
+            	response.setHeader("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + (contentLength - 1));
             	bytesToWrite = rangeEnd - rangeStart + 1;
 				response.setHeader("Content-Length", "" + bytesToWrite);
             }
