@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinResponse;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.communication.StreamRequestHandler;
+import org.apache.http.HttpStatus;
 
 public class ContentRangeRequestHandler extends StreamRequestHandler {
 
@@ -39,7 +39,7 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 	 */
 	private static final long serialVersionUID = -2414216433642616050L;
 	
-	public static final int BUFFER_SIZE = 32 * 1024;
+	public static final int BUFFER_SIZE = 64 * 1024;
 
 	@Override
 	public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response)
@@ -47,10 +47,6 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 
 		String header = request.getHeader("Range");
 		if (header == null) {
-			return super.handleRequest(session, request, response);
-		}
-
-		if (!isSafari(session)) {
 			return super.handleRequest(session, request, response);
 		}
 
@@ -84,7 +80,7 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 
 				try {
 					if (streamResource != null)
-						writeResponse(response, file, input, streamResource, rangeStart, rangeEnd);
+						writeResponse(session, response, file, input, streamResource, rangeStart, rangeEnd);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -93,21 +89,8 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 	    return true;
 	}
 
-	private boolean isSafari(VaadinSession session) {
-		boolean result = false;
-		try {
-			session.lock();
-			result = session.getBrowser().isSafari();
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			session.unlock();
-		}
-
-		return result;
-	}
-
-    public static void writeResponse(VaadinResponse response,
+    public static void writeResponse(VaadinSession session,
+									 VaadinResponse response,
 									 File file,
 									 FileInputStream data,
 									 StreamResource streamResource,
@@ -125,7 +108,7 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
             response.setContentType(Files.probeContentType(file.toPath()));
 
             // Sets cache headers
-			if (streamResource != null && response != null) {
+			if (streamResource != null) {
 				response.setCacheTime(streamResource.getCacheTime());
 			}
 
@@ -136,12 +119,15 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 			long contentLength = file.length();
             long bytesToWrite = -1;
             data.skip(rangeStart); // Skip to start offset of the request
-            if (rangeStart > 0 || rangeEnd > 0) {
-            	response.setStatus(206); // 206 response code needed since this is partial data
-//            	long contentLength = data.available();
-            	if (rangeEnd == -1) rangeEnd = data.available() - 1;
-            	response.setHeader("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + (contentLength - 1));
-            	bytesToWrite = rangeEnd - rangeStart + 1;
+            if (rangeStart >= 0 || rangeEnd > 0) {
+				// 206 response code needed since this is partial data
+            	response.setStatus(HttpStatus.SC_PARTIAL_CONTENT);
+
+            	if (rangeEnd == -1) rangeEnd = rangeStart + data.available() - 1;
+
+            	bytesToWrite = (rangeEnd + 1) - rangeStart;
+
+				response.setHeader("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + contentLength);
 				response.setHeader("Content-Length", "" + bytesToWrite);
             }
             out = response.getOutputStream();

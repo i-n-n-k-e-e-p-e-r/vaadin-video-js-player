@@ -3,7 +3,7 @@
 
     <groupId>com.brownie.videojs</groupId>
     <artifactId>video-js-player</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <name>video-js-player</name>
     <description>Integration of video.js for Vaadin platform</description>
 
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <!-- Replace artifactId with vaadin-core to use only free components -->
-            <artifactId>vaadin</artifactId>
+            <artifactId>vaadin-core</artifactId>
             <exclusions>
                 <!-- Webjars are only needed when running in Vaadin 13 compatibility mode in V14.
                      Your add-on can support npm in the same version mode and V13 compatiblity mode at the same time,
