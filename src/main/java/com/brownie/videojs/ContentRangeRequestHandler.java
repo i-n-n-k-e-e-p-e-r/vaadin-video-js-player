@@ -9,15 +9,13 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.VaadinRequest;
-import com.vaadin.flow.server.VaadinResponse;
-import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.*;
 import com.vaadin.flow.server.communication.StreamRequestHandler;
 import org.apache.http.HttpStatus;
 
@@ -55,7 +53,12 @@ public class ContentRangeRequestHandler extends StreamRequestHandler {
 				.map(value ->
 						URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20"))
 				.collect(Collectors.joining(splitter));
-	    File file = VideoJS.getResourcesRegistrations().get(resourcePathFromRequest).getValue();
+		AbstractMap.SimpleImmutableEntry<StreamRegistration, File> streamRegistrationFile = VideoJS.getResourcesRegistrations().get(resourcePathFromRequest);
+		if (streamRegistrationFile == null) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return true;
+		}
+		File file = streamRegistrationFile.getValue();
 	    if (!file.exists()) {
 	    	response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 	    	return true;
